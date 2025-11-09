@@ -1,15 +1,15 @@
 "use client";
 
-import { useId, useState } from "react";
+import { FormEvent, useId, useState } from "react";
 
 export default function Home() {
     const steamInputId = useId();
     const [userData, setUserData] = useState();
 
-    function handleSubmit(e) {
+    function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const formData = new FormData(e.target);
+        const formData = new FormData(e.currentTarget);
         const formJson = Object.fromEntries(formData.entries());
 
         fetch(
