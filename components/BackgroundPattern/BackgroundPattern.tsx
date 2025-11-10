@@ -1,8 +1,6 @@
-/* eslint-disable react-hooks/purity */
 export default function BackgroundPattern() {
     return (
         <div className="fixed inset-0 -z-10 overflow-hidden bg-linear-to-br from-slate-900 via-purple-900 to-slate-900">
-            {/* Animated Grid Background */}
             <div className="fixed inset-0 opacity-10">
                 <div
                     className="absolute inset-0"
