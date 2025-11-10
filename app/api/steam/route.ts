@@ -1,4 +1,3 @@
-import { GameData } from '@/app/page';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -23,7 +22,8 @@ export async function GET(request: NextRequest) {
         const {avatarfull, personaname, steamid} = userData.response.players[0]
 
         const formattedGames = gamesData.response.games.map(
-            (game: GameData) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (game: any) => {
                 return {
                     name: game.name,
                     img_icon_url: game.img_icon_url,
