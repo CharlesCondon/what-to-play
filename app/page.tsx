@@ -24,6 +24,7 @@ export default function Home() {
     const [minCompareValue, setMinCompareValue] = useState<number>(2);
     const [errorMsg, setErrorMsg] = useState<string>("");
     const [showSpinner, setShowSpinner] = useState<boolean>(false);
+    const [hiddenGameIds, setHiddenGameIds] = useState<Set<number>>(new Set());
 
     const commonGames = useMemo(() => {
         if (allUsers.length < 2) {
@@ -48,6 +49,10 @@ export default function Home() {
 
         return similar.sort((a, b) => a.name.localeCompare(b.name));
     }, [allUsers, minCompareValue]);
+
+    const visibleGames = useMemo(() => {
+        return commonGames.filter((game) => !hiddenGameIds.has(game.appid));
+    }, [commonGames, hiddenGameIds]);
 
     function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -81,6 +86,14 @@ export default function Home() {
         setMinCompareValue(parseInt(e.target.value));
     }
 
+    function hideGame(appid: number) {
+        setHiddenGameIds(new Set(hiddenGameIds).add(appid));
+    }
+
+    function resetHiddenGames() {
+        setHiddenGameIds(new Set());
+    }
+
     const dropdownOptions = Array.from(
         { length: allUsers.length - 1 },
         (_, i) => i + 2
@@ -109,7 +122,7 @@ export default function Home() {
 
                         <button
                             type="submit"
-                            className="border rounded-md px-4 py-1"
+                            className="border rounded-md px-4 py-1 cursor-pointer hover:bg-gray-100"
                         >
                             Submit
                         </button>
@@ -124,7 +137,7 @@ export default function Home() {
                             value={minCompareValue}
                             onChange={handleCompareChange}
                             disabled={allUsers.length < 2}
-                            className="border-l border-solid border-black  px-4 py-2 disabled:opacity-50"
+                            className="border-l border-solid border-black  px-4 py-2 disabled:opacity-50 cursor-pointer hover:bg-gray-100"
                         >
                             {dropdownOptions.map((num) => (
                                 <option key={num} value={num}>
@@ -164,14 +177,24 @@ export default function Home() {
                 {commonGames.length > 0 && (
                     <>
                         <div className="w-full">
-                            <h2 className="text-2xl font-bold mb-4">
-                                Common Games ({commonGames.length})
-                            </h2>
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-2xl font-bold">
+                                    Shared Games ({visibleGames.length})
+                                </h2>
+                                {hiddenGameIds.size > 0 && (
+                                    <button
+                                        onClick={resetHiddenGames}
+                                        className="border rounded-md px-4 py-1 text-sm hover:bg-gray-100 cursor-pointer"
+                                    >
+                                        Reset ({hiddenGameIds.size} hidden)
+                                    </button>
+                                )}
+                            </div>
                             <ul className="flex flex-wrap gap-2">
-                                {commonGames.map((game) => (
+                                {visibleGames.map((game) => (
                                     <li
                                         key={game.appid}
-                                        className="border rounded p-3 flex items-center gap-3"
+                                        className="border rounded py-3 px-3 flex items-center gap-3 relative group"
                                     >
                                         <Image
                                             src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
@@ -180,6 +203,13 @@ export default function Home() {
                                             alt=""
                                         />
                                         <span>{game.name}</span>
+                                        <button
+                                            onClick={() => hideGame(game.appid)}
+                                            className="text-black hover:text-red-500 font-bold cursor-pointer text-xs"
+                                            aria-label="Hide game"
+                                        >
+                                            ✕
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
@@ -188,11 +218,11 @@ export default function Home() {
                             onClick={() => {
                                 setShowSpinner(!showSpinner);
                             }}
-                            className="border rounded-md px-4 py-1"
+                            className="border rounded-md px-4 py-1 cursor-pointer hover:bg-gray-100"
                         >
                             {showSpinner ? "Hide Spinner" : "Show Spinner"}
                         </button>
-                        {showSpinner && <Spinner games={commonGames} />}
+                        {showSpinner && <Spinner games={visibleGames} />}
                     </>
                 )}
             </main>

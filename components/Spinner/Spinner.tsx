@@ -184,7 +184,7 @@ export default function Spinner({ games = [] }: WheelProps) {
             <button
                 onClick={spinWheel}
                 disabled={isSpinning}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold text-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold text-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
                 {isSpinning ? "Spinning..." : "SPIN!"}
             </button>
