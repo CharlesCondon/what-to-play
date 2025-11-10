@@ -3,6 +3,7 @@ interface Category {
     description: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface CachedGame {
     appid: number;
     categories: Category[];

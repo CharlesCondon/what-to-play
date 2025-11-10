@@ -17,17 +17,36 @@ export default function Spinner({ games = [] }: WheelProps) {
     const [selectedGame, setSelectedGame] = useState<GameMini | null>(null);
 
     const colors = [
-        "#FF6B6B",
-        "#4ECDC4",
-        "#45B7D1",
-        "#FFA07A",
-        "#98D8C8",
-        "#F7DC6F",
-        "#BB8FCE",
-        "#85C1E2",
-        "#F8B88B",
-        "#AAB7B8",
+        "#8B5CF6", // purple-500
+        "#EC4899", // pink-500
+        "#6366F1", // indigo-500
+        "#A855F7", // purple-500
+        "#D946EF", // fuchsia-500
+        "#7C3AED", // violet-600
+        "#DB2777", // pink-600
+        "#9333EA", // purple-600
+        "#C026D3", // fuchsia-600
+        "#8B5CF6", // purple-500
     ];
+
+    function adjustBrightness(hex: string, percent: number): string {
+        const num = parseInt(hex.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = ((num >> 8) & 0x00ff) + amt;
+        const B = (num & 0x0000ff) + amt;
+        return (
+            "#" +
+            (
+                0x1000000 +
+                (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+                (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+                (B < 255 ? (B < 1 ? 0 : B) : 255)
+            )
+                .toString(16)
+                .slice(1)
+        );
+    }
 
     const drawWheel = (currentRotation: number) => {
         const canvas = canvasRef.current;
@@ -38,11 +57,23 @@ export default function Spinner({ games = [] }: WheelProps) {
 
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        const radius = Math.min(centerX, centerY) - 10;
+        const radius = Math.min(centerX, centerY) - 20;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // draw and rotate the wheel
+        // Draw outer glow
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.shadowColor = "rgba(139, 92, 246, 0.5)";
+        ctx.shadowBlur = 30;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 5, 0, 2 * Math.PI);
+        ctx.strokeStyle = "rgba(139, 92, 246, 0.3)";
+        ctx.lineWidth = 10;
+        ctx.stroke();
+        ctx.restore();
+
+        // Draw and rotate the wheel
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate((currentRotation * Math.PI) / 180);
@@ -53,29 +84,39 @@ export default function Spinner({ games = [] }: WheelProps) {
             const startAngle = index * sliceAngle;
             const endAngle = startAngle + sliceAngle;
 
-            // slice
+            // Draw slice with gradient
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+            gradient.addColorStop(0, colors[index % colors.length]);
+            gradient.addColorStop(
+                1,
+                adjustBrightness(colors[index % colors.length], -20)
+            );
+
             ctx.beginPath();
             ctx.moveTo(0, 0);
             ctx.arc(0, 0, radius, startAngle, endAngle);
             ctx.closePath();
-            ctx.fillStyle = colors[index % colors.length];
+            ctx.fillStyle = gradient;
             ctx.fill();
-            ctx.strokeStyle = "#fff";
+
+            // Stroke with slight glow
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // text
+            // Draw text
             ctx.save();
             ctx.rotate(startAngle + sliceAngle / 2);
             ctx.textAlign = "center";
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 14px Arial";
-            ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-            ctx.shadowBlur = 3;
+            ctx.fillStyle = "#FFFFFF";
+            ctx.font =
+                "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+            ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+            ctx.shadowBlur = 4;
 
             const text =
-                game.name.length > 20
-                    ? game.name.substring(0, 18) + "..."
+                game.name.length > 18
+                    ? game.name.substring(0, 16) + "..."
                     : game.name;
             ctx.fillText(text, radius * 0.65, 5);
             ctx.restore();
@@ -83,24 +124,55 @@ export default function Spinner({ games = [] }: WheelProps) {
 
         ctx.restore();
 
-        // center circle
+        // Draw center circle with gradient
+        const centerGradient = ctx.createRadialGradient(
+            centerX,
+            centerY,
+            0,
+            centerX,
+            centerY,
+            30
+        );
+        centerGradient.addColorStop(0, "#6B21A8");
+        centerGradient.addColorStop(1, "#4C1D95");
+
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
-        ctx.fillStyle = "#333";
+        ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
+        ctx.fillStyle = centerGradient;
         ctx.fill();
-        ctx.strokeStyle = "#fff";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // top pointer
+        // Add center glow
+        ctx.shadowColor = "rgba(139, 92, 246, 0.6)";
+        ctx.shadowBlur = 15;
         ctx.beginPath();
-        ctx.moveTo(centerX, 30);
-        ctx.lineTo(centerX - 15, -5);
-        ctx.lineTo(centerX + 15, -5);
+        ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
+        ctx.strokeStyle = "rgba(139, 92, 246, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw pointer at top with glow
+        ctx.shadowColor = "rgba(239, 68, 68, 0.8)";
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.moveTo(centerX, 40);
+        ctx.lineTo(centerX - 20, 10);
+        ctx.lineTo(centerX + 20, 10);
         ctx.closePath();
-        ctx.fillStyle = "#000000";
+
+        const pointerGradient = ctx.createLinearGradient(
+            centerX,
+            10,
+            centerX,
+            40
+        );
+        pointerGradient.addColorStop(0, "#EF4444");
+        pointerGradient.addColorStop(1, "#DC2626");
+        ctx.fillStyle = pointerGradient;
         ctx.fill();
-        ctx.strokeStyle = "#fff";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
         ctx.lineWidth = 2;
         ctx.stroke();
     };
@@ -158,41 +230,46 @@ export default function Spinner({ games = [] }: WheelProps) {
         if (games && games.length > 0) {
             drawWheel(rotation);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [games, rotation]);
 
-    if (!games || games.length === 0) {
-        return (
-            <div className="flex flex-col items-center gap-4 p-8 border rounded-lg">
-                <p className="text-gray-500">
-                    Add at least 2 users to spin the wheel
-                </p>
-            </div>
-        );
-    }
-
     return (
-        <div className="flex flex-col items-center gap-6 p-8 w-full">
-            <h2 className="text-2xl font-bold">Spin to Choose a Game!</h2>
-
-            <canvas
-                ref={canvasRef}
-                width={500}
-                height={500}
-                className="max-w-full"
-            />
+        <div className="flex flex-col items-center gap-8 p-8 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl w-full shadow-2xl">
+            <div className="relative">
+                <canvas
+                    ref={canvasRef}
+                    width={500}
+                    height={500}
+                    className="max-w-full drop-shadow-2xl"
+                />
+                {isSpinning && (
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute inset-0 bg-purple-500/10 rounded-full animate-ping"></div>
+                    </div>
+                )}
+            </div>
 
             <button
                 onClick={spinWheel}
                 disabled={isSpinning}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold text-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="px-10 py-4 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold text-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-purple-500/50 hover:scale-105 disabled:hover:scale-100"
             >
-                {isSpinning ? "Spinning..." : "SPIN!"}
+                {isSpinning ? (
+                    <span className="flex items-center gap-3">
+                        <span className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        Spinning...
+                    </span>
+                ) : (
+                    "SPIN THE WHEEL"
+                )}
             </button>
 
             {selectedGame && !isSpinning && (
-                <div className="flex items-center gap-4 p-4 bg-green-100 rounded-lg border-2 border-green-500">
-                    <div className="text-center">
-                        <p className="text-xl font-bold">{selectedGame.name}</p>
+                <div className="w-full max-w-md backdrop-blur-xl bg-linear-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-400 rounded-2xl p-6 shadow-2xl shadow-green-500/20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="text-center space-y-2">
+                        <p className="text-2xl font-bold text-white">
+                            {selectedGame.name}
+                        </p>
                     </div>
                 </div>
             )}
