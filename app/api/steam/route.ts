@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { gameCache } from '@/lib/gameCache';
+
+// interface Category {
+//     id: number;
+//     description: string;
+// }
 
 export async function GET(request: NextRequest) {
     const steamId = request.nextUrl.searchParams.get('steamid');
@@ -21,18 +27,34 @@ export async function GET(request: NextRequest) {
 
         const {avatarfull, personaname, steamid} = userData.response.players[0]
 
+        const categoryPromises = gamesData.response.games.map(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            async (game: any) => {
+                const categories = await gameCache.getCategories(game.appid);
+                return {
+                    appid: game.appid,
+                    categories
+                };
+            }
+        );
+
+        const categoriesResults = await Promise.all(categoryPromises);
+        const categoriesMap = new Map(
+            categoriesResults.map(result => [result.appid, result.categories])
+        );
+
         const formattedGames = gamesData.response.games.map(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (game: any) => {
                 return {
                     name: game.name,
                     img_icon_url: game.img_icon_url,
-                    appid: game.appid
+                    appid: game.appid,
+                    categories: categoriesMap.get(game.appid) || []
                 };
             }
         );
 
-        // Combine both responses
         return NextResponse.json({
             games: formattedGames,
             avatar: avatarfull,
