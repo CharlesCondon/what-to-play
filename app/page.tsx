@@ -13,7 +13,7 @@ export default function Home() {
         const formJson = Object.fromEntries(formData.entries());
 
         fetch(
-            `http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${process.env.NEXT_PUBLIC_STEAM_KEY}&steamid=${formJson.steamID}`
+            `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${process.env.NEXT_PUBLIC_STEAM_KEY}&steamid=${formJson.steamID}`
         )
             .then((response) => response.json())
             .then((data) => {
