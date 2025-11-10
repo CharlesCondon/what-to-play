@@ -252,7 +252,7 @@ export default function Spinner({ games = [] }: WheelProps) {
             <button
                 onClick={spinWheel}
                 disabled={isSpinning}
-                className="px-10 py-4 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold text-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-purple-500/50 hover:scale-105 disabled:hover:scale-100"
+                className={`px-10 py-4 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold text-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-purple-500/50 hover:scale-105 disabled:hover:scale-100 `}
             >
                 {isSpinning ? (
                     <span className="flex items-center gap-3">
@@ -265,8 +265,8 @@ export default function Spinner({ games = [] }: WheelProps) {
             </button>
 
             {selectedGame && !isSpinning && (
-                <div className="w-full max-w-md backdrop-blur-xl bg-linear-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-400 rounded-2xl p-6 shadow-2xl shadow-green-500/20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="text-center space-y-2">
+                <div className="w-full max-w-md backdrop-blur-xl bg-linear-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-400 rounded-2xl p-6 shadow-2xl shadow-green-500/20 ">
+                    <div className="text-center">
                         <p className="text-2xl font-bold text-white">
                             {selectedGame.name}
                         </p>

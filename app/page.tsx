@@ -426,9 +426,9 @@ export default function Home() {
                                 onClick={() => {
                                     setShowSpinner(!showSpinner);
                                 }}
-                                className="rounded-xl px-8 py-4 bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold text-lg shadow-2xl hover:shadow-purple-500/50 transition-all hover:scale-105"
+                                className="mt-20 rounded-xl px-8 py-4 bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold text-lg shadow-2xl hover:shadow-purple-500/50 transition-all hover:scale-105"
                             >
-                                {showSpinner ? "Hide Spinner" : "Open Spinner"}
+                                {showSpinner ? "Hide Wheel" : "Open Wheel"}
                             </button>
                             {showSpinner && (
                                 <div className="mt-8 w-full">
