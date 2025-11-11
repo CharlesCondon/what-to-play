@@ -182,7 +182,7 @@ export default function Home() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen items-center font-sans ">
+        <div className="flex flex-col min-h-screen items-center font-sans">
             {/* Hero Header */}
             <header className="w-full max-w-5xl px-4 sm:px-8 pt-12 pb-8">
                 <div className="text-center space-y-2">
