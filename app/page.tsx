@@ -3,6 +3,7 @@
 import { useId, useState, FormEvent, useMemo, SetStateAction } from "react";
 import Image from "next/image";
 import Spinner from "@/components/Spinner/Spinner";
+import Footer from "@/components/Footer/Footer";
 
 interface User {
     id: number;
@@ -450,6 +451,7 @@ export default function Home() {
                     </div>
                 )}
             </main>
+            <Footer />
         </div>
     );
 }
